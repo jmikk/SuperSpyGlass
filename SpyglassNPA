@@ -74,6 +74,7 @@ if "-n" in sys.argv:
 else:
     print( "Spyglass {}: Generate NationStates region update timesheets.".format(VERSION))
     UAgent = str(input('Nation Name: '))
+    tag = str(input('Tag to search (Fascist)'))
     filename = 'SpyglassSheet' + YMD + '.xlsx'
 
     if query("Include region embassies? (y/n, defaults to y) ", ['y', 'n', '']) == 'n':
@@ -144,8 +145,8 @@ if log:
 # Total number of queries is low, so rate limit is unnecessary
 req = urllib.request.Request('https://www.nationstates.net/cgi-bin/api.cgi?q=regionsbytag;tags=-password', None, headers)
 req2 = urllib.request.Request('https://www.nationstates.net/cgi-bin/api.cgi?q=regionsbytag;tags=founderless', None, headers)
-fashBash = urllib.request.Request('https://www.nationstates.net/cgi-bin/api.cgi?q=regionsbytag;tags=-password,fascist', None, headers)
-peakFashBash = urllib.request.Request('https://www.nationstates.net/cgi-bin/api.cgi?q=regionsbytag;tags=-password,fascist,founderless', None, headers)
+fashBash = urllib.request.Request('https://www.nationstates.net/cgi-bin/api.cgi?q=regionsbytag;tags=-password,'+tag, None, headers)
+peakFashBash = urllib.request.Request('https://www.nationstates.net/cgi-bin/api.cgi?q=regionsbytag;tags=-password,'+tag+',founderless', None, headers)
 html = urllib.request.urlopen(req).read()
 html2 = urllib.request.urlopen(req2).read()
 html3 = urllib.request.urlopen(fashBash).read()
@@ -319,11 +320,11 @@ ws['P4'].value = 'Passworded*'
 ws.cell(row=4, column=15).fill = redFill
 ws.cell(row=4, column=16).fill = redFill
 ws['O5'].value = 'Blue'
-ws['P5'].value = 'Fash w/ founder and no password !'
+ws['P5'].value = tag + ' w/ founder and no password !'
 ws.cell(row=5, column=15).fill = blueFill
 ws.cell(row=5, column=16).fill = blueFill
 ws['O6'].value = 'Pink'
-ws['P6'].value = 'Fash W/O founder and no password !! go bash those fash!'
+ws['P6'].value = tag+' W/O founder and no password !!'
 ws.cell(row=6, column=15).fill = pinkFill
 ws.cell(row=6, column=16).fill = pinkFill
 ws['L6'].value = 'Last Minor'
