@@ -18,7 +18,7 @@ from datetime import datetime
 import os
 import sys
 import urllib.request
-import numpy as np
+#import numpy as np
 
 
 logpath = "debug.log"
