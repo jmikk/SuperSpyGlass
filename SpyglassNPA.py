@@ -18,7 +18,6 @@ from datetime import datetime
 import os
 import sys
 import urllib.request
-#import numpy as np
 
 
 logpath = "debug.log"
@@ -58,7 +57,7 @@ if "-h" in sys.argv or "--help" in sys.argv:
           "working directory.")
     sys.exit()
 
-process_embassies = True
+process_embassies = False
 log = True
 
 SpeedOverride = False
@@ -74,11 +73,13 @@ if "-n" in sys.argv:
 else:
     print( "Spyglass {}: Generate NationStates region update timesheets.".format(VERSION))
     UAgent = str(input('Nation Name: '))
-    tag = str(input('Tag to search (Fascist)'))
+    tag = str(input('Tag to search (Default is Fascist)'))
+    if not tag:
+        tag="Fascist"
     filename = 'SpyglassSheet' + YMD + '.xlsx'
 
-    if query("Include region embassies? (y/n, defaults to y) ", ['y', 'n', '']) == 'n':
-        process_embassies = False
+#    if query("Include region embassies? (y/n, defaults to y) ", ['y', 'n', '']) == 'n':
+#        process_embassies = False
 
     # Update lengths are now set to 44m and 59m, per word of [v]
     if query("Do you want to manually specify update lengths? (y/n, defaults to n) ", ['y', 'n', '']) == 'y':
@@ -205,49 +206,49 @@ with open('regions.xml', 'r') as myfile:
 #input(regions)
 root = regions.split("\\n\'b\'")
 for x in root:
-	if '<NAME>' in x and '</NAME>' in x:
-		x=x.replace("</NAME>","")
-		x=x.replace("<NAME>","")
-		RegionList.append(x)
-		UrlString = '=HYPERLINK("https://www.nationstates.net/region=' + x + '")'
-		UrlString=UrlString.replace(' ', '_')
-		RegionURLList.append(UrlString)
-	if '<NUMNATIONS>' in x and '</NUMNATIONS>' in x:
-		x=x.replace("</NUMNATIONS>","")
-		x=x.replace("<NUMNATIONS>","")
-		NumNationList.append(x)
-	if '<DELEGATEVOTES>' in x and '</DELEGATEVOTES>' in x:
-		x=x.replace("</DELEGATEVOTES>","")
-		x=x.replace("<DELEGATEVOTES>","")
-		DelVoteList.append(x)
-	if '<DELEGATEAUTH>' in x and '</DELEGATEAUTH>' in x:
-		x=x.replace("</DELEGATEAUTH>","")
-		x=x.replace("<DELEGATEAUTH>","")
-		if 'X' in x:
-			ExecList.append(True)
-		else:
-			ExecList.append(False)
-	# KH: pull major times from daily dump
-	if '<LASTUPDATE>' in x and '</LASTUPDATE>' in x:
-		x=x.replace("</LASTUPDATE>","")
-		x=x.replace("<LASTUPDATE>","")
-		MajorList.append(x)
-	# KH: gather WFE info
-	if '<FACTBOOK>' in x and '</FACTBOOK>' in x:
-		x=x.replace("</FACTBOOK>","")
-		x=x.replace("<FACTBOOK>","")
-		try:
-			if ['=', '+', "-", "@"] in x:
-				x="'"+x
-			RegionWFEList.append(x)
-		except TypeError: # no WFE
-			RegionWFEList.append(" ")
-	# KH: gather embassy list
-	if '<EMBASSY>' in x and '</EMBASSY>' in x:
-		x=x.replace("</EMBASSY>","")
-		x=x.replace("<EMBASSY>","")
-		if process_embassies:
-			RegionEmbassyList.append(x)
+    if '<NAME>' in x and '</NAME>' in x:
+        x=x.replace("</NAME>","")
+        x=x.replace("<NAME>","")
+        RegionList.append(x)
+        UrlString = '=HYPERLINK("https://www.nationstates.net/region=' + x + '")'
+        UrlString=UrlString.replace(' ', '_')
+        RegionURLList.append(UrlString)
+    if '<NUMNATIONS>' in x and '</NUMNATIONS>' in x:
+        x=x.replace("</NUMNATIONS>","")
+        x=x.replace("<NUMNATIONS>","")
+        NumNationList.append(x)
+    if '<DELEGATEVOTES>' in x and '</DELEGATEVOTES>' in x:
+        x=x.replace("</DELEGATEVOTES>","")
+        x=x.replace("<DELEGATEVOTES>","")
+        DelVoteList.append(x)
+    if '<DELEGATEAUTH>' in x and '</DELEGATEAUTH>' in x:
+        x=x.replace("</DELEGATEAUTH>","")
+        x=x.replace("<DELEGATEAUTH>","")
+        if 'X' in x:
+            ExecList.append(True)
+        else:
+            ExecList.append(False)
+    # KH: pull major times from daily dump
+    if '<LASTUPDATE>' in x and '</LASTUPDATE>' in x:
+        x=x.replace("</LASTUPDATE>","")
+        x=x.replace("<LASTUPDATE>","")
+        MajorList.append(x)
+    # KH: gather WFE info
+    if '<FACTBOOK>' in x and '</FACTBOOK>' in x:
+        x=x.replace("</FACTBOOK>","")
+        x=x.replace("<FACTBOOK>","")
+        try:
+            if ['=', '+', "-", "@"] in x:
+                x="'"+x
+            RegionWFEList.append(x)
+        except TypeError: # no WFE
+            RegionWFEList.append(" ")
+    # KH: gather embassy list
+    if '<EMBASSY>' in x and '</EMBASSY>' in x:
+        x=x.replace("</EMBASSY>","")
+        x=x.replace("<EMBASSY>","")
+        if process_embassies:
+            RegionEmbassyList.append(x)
 # Grabbing the cumulative number of nations that've updated by the time a region has.
 # The first entry is zero because time calculations need to reflect the start of region update, not the end
 CumulNationList = [0]
@@ -386,7 +387,7 @@ for a in RegionList:
     ws.cell(row=counter + 2, column=6).alignment = Alignment(horizontal="right")
     ws.cell(row=counter + 2, column=7).value = DelVoteList[counter]
     ws.cell(row=counter + 2, column=8).value = float(DelVoteList[counter]) - 1
-    ws.cell(row=counter + 2, column=9).value = RegionEmbassyList[counter]
+    #ws.cell(row=counter + 2, column=9).value = RegionEmbassyList[counter]
     #ws.cell(row=counter + 2, column=10).value = RegionWFEList[counter]
     ws.cell(row=counter + 2, column=11).value = " "
 
